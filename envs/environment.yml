@@ -1,0 +1,10 @@
+name: vqa_env
+channels:
+  - defaults
+dependencies:
+  - pymongo
+  - keras
+  - theano
+  - jupyter
+  - pillow
+  - matplotlib
