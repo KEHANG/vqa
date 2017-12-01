@@ -140,6 +140,15 @@ def get_tokenizer(texts):
 
     return tokenizer
 
+def get_bag_of_words_embedding_matrix(word_index):
+
+    num_words = len(word_index)
+    embedding_matrix = np.zeros((num_words+1, num_words+1))
+    for word, i in word_index.items():
+        embedding_matrix[i][i] = 1.0
+
+    return embedding_matrix
+
 # Loading data from disk
 class DataLoaderDisk(object):
     def __init__(self, **kwargs):
