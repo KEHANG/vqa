@@ -27,11 +27,17 @@ def train():
     model = vqa_model(embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
     
     batch_size = 100
-    iters = 600
+    epochs = 100
+    iters = int(data_loader.train_num*epochs/batch_size)
     for iteration in range(iters):
       img_batch, que_batch, y_batch = loader_train.next_batch(batch_size)
       hist = model.fit([img_batch, que_batch], y_batch, epochs=1, batch_size=batch_size)
 
+      # save model every epoch
+      iter_per_epoch = int(data_loader.train_num/batch_size)
+      if iteration % iter_per_epoch == 0:
+        epoch = int(iteration/iter_per_epoch)
+        model.save_weights('saved_models/model_weights_epoch_{0}.h5'.format(epoch))
 
 train()
 
