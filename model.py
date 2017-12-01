@@ -4,7 +4,8 @@
 ##################################################
 
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, LSTM, Embedding, Merge
+from keras.layers import Dense, Dropout, LSTM, Embedding
+from keras.layers.merge import Multiply
 from keras.applications.vgg16 import VGG16
 from keras.models import Model
 
@@ -46,13 +47,17 @@ def vgg_model():
 def vqa_model(embedding_matrix, seq_length, dropout_rate, num_classes):
     vgg = vgg_model()
     lstm_model = Word2VecModel(embedding_matrix, seq_length, dropout_rate)
+    
     print "Merging final model..."
-    fc_model = Sequential()
-    fc_model.add(Merge([vgg, lstm_model], mode='mul'))
-    fc_model.add(Dropout(dropout_rate))
-    fc_model.add(Dense(1000, activation='tanh'))
-    fc_model.add(Dropout(dropout_rate))
-    fc_model.add(Dense(num_classes, activation='softmax'))
+    inputs = [vgg.layers[0].input, lstm_model.layers[0].input]
+    intermediates = [vgg.layers[-1].output, lstm_model.layers[-1].output]
+    x = Multiply()(intermediates)
+    x = Dropout(dropout_rate)(x)
+    x = Dense(1000, activation='tanh')(x)
+    x = Dropout(dropout_rate)(x)
+    output = Dense(num_classes, activation='softmax')(x)
+    
+    fc_model = Model(inputs, output)
     fc_model.compile(optimizer='rmsprop', loss='categorical_crossentropy',metrics=['accuracy'])
     return fc_model
 
