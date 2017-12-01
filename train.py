@@ -7,6 +7,9 @@ from model import vqa_model
 ####### Run Training #######
 ############################
 def train():
+    # create folders needed
+    if not os.path.exists('saved_models'):
+      os.mkdir("saved_models")
     ### read training data and validation data
     data_path = os.path.join('data')
     opt_data_train = {
