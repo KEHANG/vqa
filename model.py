@@ -22,7 +22,6 @@ def Word2VecModel(embedding_matrix, seq_length, dropout_rate):
     model.add(LSTM(units=512, return_sequences=False))
     model.add(Dropout(dropout_rate))
     model.add(Dense(1024, activation='tanh'))
-    model.summary()
     return model
 
 ###########################
@@ -39,7 +38,6 @@ def vgg_model():
     new_layer = Dense(1024, input_dim=4096, activation='tanh')(vgg16.layers[-2].output)
     #Then create the corresponding model
     model = Model(inputs=vgg16.input, outputs=new_layer)
-    model.summary()
     return model
 
 #########################
