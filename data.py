@@ -149,6 +149,28 @@ def get_bag_of_words_embedding_matrix(word_index):
 
     return embedding_matrix
 
+def get_glove_embedding_matrix(word_index, glove_path):
+
+    embeddings_index = {}
+    # get embeddings dictionary from file
+    with open(glove_path, 'r') as glove_file:
+        for line in glove_file:
+            values = line.split()
+            word = values[0]
+            coefs = np.asarray(values[1:], dtype='float32')
+            embeddings_index[word] = coefs
+    # loop over question words and create embedding matrix
+    num_words = len(word_index)
+    embedding_matrix = np.zeros((num_words+1, len(coefs)))
+    # zero-th element is for padding elements with 0 embedding
+    for word, i in word_index.iteritems():
+        # remove special characters that are not letters or numbers and make lowercase
+        embedding_vector = embeddings_index.get(word)
+        if embedding_vector is not None:
+            embedding_matrix[i] = embedding_vector
+
+    return embedding_matrix
+
 # Loading data from disk
 class DataLoaderDisk(object):
     def __init__(self, **kwargs):
