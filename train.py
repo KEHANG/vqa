@@ -2,6 +2,7 @@ import os
 
 from data import DataLoaderDisk, get_bag_of_words_embedding_matrix
 from model import vqa_model
+from utils import log_to_file
 
 ############################
 ####### Run Training #######
@@ -10,7 +11,8 @@ def train():
     # create folders needed
     if not os.path.exists('saved_models'):
       os.mkdir("saved_models")
-    ### read training data and validation data
+
+    # create data loader
     data_path = os.path.join('data')
     opt_data_train = {
         'data_root': data_path,   # MODIFY PATH ACCORDINGLY
@@ -20,18 +22,32 @@ def train():
         }
 
 
-    loader_train = DataLoaderDisk(**opt_data_train)
+    data_loader = DataLoaderDisk(**opt_data_train)
 
     seq_length = 25
-    embedding_matrix = get_bag_of_words_embedding_matrix(loader_train.tokenizer.word_index)
+    embedding_matrix = get_bag_of_words_embedding_matrix(data_loader.tokenizer.word_index)
     model = vqa_model(embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
     
     batch_size = 100
     epochs = 100
     iters = int(data_loader.train_num*epochs/batch_size)
     for iteration in range(iters):
-      img_batch, que_batch, y_batch = loader_train.next_batch(batch_size)
-      hist = model.fit([img_batch, que_batch], y_batch, epochs=1, batch_size=batch_size)
+      img_batch_train, que_batch_train, y_batch_train = data_loader.next_batch(batch_size, mode='train')
+      img_batch_val, que_batch_val, y_batch_val = data_loader.next_batch(batch_size, mode='val')
+      train_score = model.train_on_batch([img_batch_train, que_batch_train], y_batch_train)
+      val_score = model.test_on_batch([img_batch_val, que_batch_val], y_batch_val)
+      
+      train_loss = float(train_score[0])
+      train_acc = float(train_score[1])
+      val_loss = float(val_score[0])
+      val_acc = float(val_score[1])
+
+      # log training progress
+      msg = "iter = {0}, ".format(iteration)
+      msg += "train loss: {0:.03f}, train acc: {1:.03f} ".format(train_loss, train_acc)
+      msg += "val loss: {0:.03f}, val acc: {1:.03f}\n".format(val_loss, val_acc)
+      print msg
+      log_to_file(msg)
 
       # save model every epoch
       iter_per_epoch = int(data_loader.train_num/batch_size)
