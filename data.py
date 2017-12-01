@@ -162,6 +162,7 @@ class DataLoaderDisk(object):
         # read data info
         print "Loading data..."
         self.ximg_path_train = []
+        self.ximg_path_val = []
         (ximgid_train, xque_train, y_train), (ximgid_val, xque_val, y_val), selected_ans_list = load_data(self.data_root)
         for ximgid in ximgid_train:
             img_path = 'scene_img_abstract_v002_train2015/abstract_v002_train2015_{0:012d}.png'.format(int(ximgid))
@@ -171,42 +172,69 @@ class DataLoaderDisk(object):
         self.xque_train = np.array(xque_train, np.object)
         self.y_train = np.array(y_train, np.int64)
 
+        for ximgid in ximgid_val:
+            img_path = 'scene_img_abstract_v002_val2015/abstract_v002_val2015_{0:012d}.png'.format(int(ximgid))
+            self.ximg_path_val.append(os.path.join(self.data_root, img_path))
+
+        self.ximg_path_val = np.array(self.ximg_path_val, np.object)
+        self.xque_val = np.array(xque_val, np.object)
+        self.y_val = np.array(y_val, np.int64)
+
         # get tokenize for xque
         all_que = xque_train + xque_val
         self.tokenizer = get_tokenizer(all_que)
 
         self.selected_ans_list = selected_ans_list
-        self.num = self.ximg_path_train.shape[0]
-        print('# Training examples found: {0}'.format(self.num))
+        self.train_num = self.ximg_path_train.shape[0]
+        print('# Training examples found: {0}'.format(self.train_num))
+
+        self.val_num = self.ximg_path_val.shape[0]
+        print('# Validation examples found: {0}'.format(self.val_num))
 
         # permutation
         if self.randomize:
-            perm = np.random.permutation(self.num) 
+            perm = np.random.permutation(self.train_num) 
             self.ximg_path_train[:, ...] = self.ximg_path_train[perm, ...]
             self.xque_train[:] = self.xque_train[perm, ...]
             self.y_train[:] = self.y_train[perm, ...]
 
-        self._idx = 0
+        self._idx_train = 0
+        self._idx_val = 0
         
-    def next_batch(self, batch_size):
+    def next_batch(self, batch_size, mode='train'):
 
         img_batch = np.zeros((batch_size, self.fine_size, self.fine_size, 3))
         que_batch = np.array(['']*batch_size, np.object)
         y_batch = np.zeros(batch_size)
 
         desired_img_shape = (self.fine_size, self.fine_size)
-        for i in range(batch_size):
-            image = load_image(self.ximg_path_train[self._idx], desired_img_shape)
-            image = image.astype(np.float32)/255.
-            image = image - self.data_mean
-            
-            img_batch[i, ...] =  image
-            que_batch[i, ...] = self.xque_train[self._idx]
-            y_batch[i, ...] = self.y_train[self._idx]
-            
-            self._idx += 1
-            if self._idx == self.num:
-                self._idx = 0
+
+        if mode == 'train': 
+            for i in range(batch_size):
+                image = load_image(self.ximg_path_train[self._idx_train], desired_img_shape)
+                image = image.astype(np.float32)/255.
+                image = image - self.data_mean
+                
+                img_batch[i, ...] =  image
+                que_batch[i, ...] = self.xque_train[self._idx_train]
+                y_batch[i, ...] = self.y_train[self._idx_train]
+                
+                self._idx_train += 1
+                if self._idx_train == self.train_num:
+                    self._idx_train = 0
+        elif mode == 'val':
+            for i in range(batch_size):
+                image = load_image(self.ximg_path_val[self._idx_val], desired_img_shape)
+                image = image.astype(np.float32)/255.
+                image = image - self.data_mean
+                
+                img_batch[i, ...] =  image
+                que_batch[i, ...] = self.xque_val[self._idx_val]
+                y_batch[i, ...] = self.y_val[self._idx_val]
+                
+                self._idx_val += 1
+                if self._idx_val == self.val_num:
+                    self._idx_val = 0
         
         que_batch = self.tokenizer.texts_to_sequences(que_batch)
         que_batch = pad_sequences(que_batch, maxlen=MAX_SEQUENCE_LENGTH)
