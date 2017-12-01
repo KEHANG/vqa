@@ -1,6 +1,6 @@
 import os
 
-from data import DataLoaderDisk, get_bag_of_words_embedding_matrix
+from data import DataLoaderDisk, get_bag_of_words_embedding_matrix, get_glove_embedding_matrix
 from model import vqa_model
 from utils import log_to_file
 
@@ -25,7 +25,10 @@ def train():
     data_loader = DataLoaderDisk(**opt_data_train)
 
     seq_length = 25
-    embedding_matrix = get_bag_of_words_embedding_matrix(data_loader.tokenizer.word_index)
+    glove_path = os.path.join(data_path, 'glove.6B', 'glove.6B.300d.txt')
+    # embedding_matrix = get_bag_of_words_embedding_matrix(data_loader.tokenizer.word_index)
+    embedding_matrix = get_glove_embedding_matrix(data_loader.tokenizer.word_index,
+                                                  glove_path)
     model = vqa_model(embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
     
     batch_size = 100
