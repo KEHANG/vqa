@@ -38,7 +38,7 @@ def vgg_model():
     # Add a layer where input is the output of the second last layer (before softmax)
     new_layer = Dense(1024, input_dim=4096, activation='tanh')(vgg16.layers[-2].output)
     #Then create the corresponding model
-    model = Model(input=vgg16.input, output=new_layer)
+    model = Model(inputs=vgg16.input, outputs=new_layer)
     model.summary()
     return model
 
