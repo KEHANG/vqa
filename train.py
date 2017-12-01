@@ -23,8 +23,11 @@ def train():
     embedding_matrix = get_bag_of_words_embedding_matrix(loader_train.tokenizer.word_index)
     model = vqa_model(embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
     
-    img_batch, que_batch, y_batch = loader_train.next_batch(100)
-    hist = model.fit([img_batch, que_batch], y_batch, epochs=1, batch_size=1)
+    batch_size = 100
+    iters = 600
+    for iteration in range(iters):
+      img_batch, que_batch, y_batch = loader_train.next_batch(batch_size)
+      hist = model.fit([img_batch, que_batch], y_batch, epochs=1, batch_size=batch_size)
 
 
 train()
