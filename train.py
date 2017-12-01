@@ -52,10 +52,12 @@ def train():
       print msg
       log_to_file(msg)
 
-      # save model every epoch
+      # update lr and save model every epoch
       iter_per_epoch = int(data_loader.train_num/batch_size)
       if iteration % iter_per_epoch == 0:
         epoch = int(iteration/iter_per_epoch)
+        lr = float(0.0007 * np.exp(- epoch / 30))
+        model.optimizer.lr.set_value(lr)
         model.save_weights('saved_models/model_weights_epoch_{0}.h5'.format(epoch))
 
 train()
