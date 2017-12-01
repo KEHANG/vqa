@@ -160,6 +160,7 @@ class DataLoaderDisk(object):
         self.data_mean = np.asarray([0.45834960097,0.44674252445,0.41352266842])
 
         # read data info
+        print "Loading data..."
         self.ximg_path_train = []
         (ximgid_train, xque_train, y_train), (ximgid_val, xque_val, y_val), selected_ans_list = load_data(self.data_root)
         for ximgid in ximgid_train:
