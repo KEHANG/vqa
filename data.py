@@ -1,9 +1,14 @@
 import os
 import json
 import keras
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+
+MAX_SEQUENCE_LENGTH = 25
+MAX_NB_WORDS = 20000
 
 def load_data(data_root):
 
@@ -128,6 +133,13 @@ def load_image(img_path, size=None):
     
     return img_arry
 
+def get_tokenizer(texts):
+
+    tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
+    tokenizer.fit_on_texts(texts)
+
+    return tokenizer
+
 # Loading data from disk
 class DataLoaderDisk(object):
     def __init__(self, **kwargs):
@@ -148,6 +160,10 @@ class DataLoaderDisk(object):
         self.ximg_path_train = np.array(self.ximg_path_train, np.object)
         self.xque_train = np.array(xque_train, np.object)
         self.y_train = np.array(y_train, np.int64)
+
+        # get tokenize for xque
+        all_que = xque_train + xque_val
+        self.tokenizer = get_tokenizer(all_que)
 
         self.selected_ans_list = selected_ans_list
         self.num = self.ximg_path_train.shape[0]
@@ -182,6 +198,8 @@ class DataLoaderDisk(object):
             if self._idx == self.num:
                 self._idx = 0
         
+        que_batch = self.tokenizer.texts_to_sequences(que_batch)
+        que_batch = pad_sequences(que_batch, maxlen=MAX_SEQUENCE_LENGTH)
         y_batch = keras.utils.to_categorical(y_batch, len(self.selected_ans_list))
         
         return img_batch, que_batch, y_batch
