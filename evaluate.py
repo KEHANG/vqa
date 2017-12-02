@@ -29,7 +29,7 @@ def evaluate(weights_file,
 	model_val = vqa_model(embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
 	model_val.load_weights(weights_file)
 
-	batch_size = 10
+	batch_size = 2000
 	epochs = 1
 	iters = int(data_loader.val_num*epochs/batch_size)
 	val_accuracy = 0
