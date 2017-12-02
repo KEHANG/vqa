@@ -9,3 +9,4 @@ dependencies:
   - pillow
   - matplotlib
   - tqdm
+  - python=2.7
