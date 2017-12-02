@@ -13,7 +13,7 @@ def train():
       os.mkdir("saved_models")
 
     # create data loader
-    data_path = os.path.join('data')
+    data_path = os.path.join(os.path.dirname(__file__), 'data')
     opt_data_train = {
         'data_root': data_path,   # MODIFY PATH ACCORDINGLY
         'fine_size': 224,
