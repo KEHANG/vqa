@@ -171,6 +171,15 @@ def get_glove_embedding_matrix(word_index, glove_path):
 
     return embedding_matrix
 
+def get_embedding_matrix(word_index, embedding_type, embedding_path):
+
+    if embedding_type == 'glove':
+        return get_glove_embedding_matrix(word_index, embedding_path)
+    elif embedding_type == 'bow':
+        return get_bag_of_words_embedding_matrix(word_index)
+    else:
+        raise "{0} not supported.".format(embedding_type)
+
 # Loading data from disk
 class DataLoaderDisk(object):
     def __init__(self, **kwargs):
