@@ -3,7 +3,7 @@
 *.ipynb
 
 data/*
-
+saved_models/*
 evaluation/*
 
 
