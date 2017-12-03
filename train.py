@@ -1,5 +1,5 @@
 import os
-
+import numpy as np
 from data import DataLoaderDisk, get_bag_of_words_embedding_matrix, get_glove_embedding_matrix
 from model import vqa_model
 from utils import log_to_file
