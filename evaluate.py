@@ -6,8 +6,10 @@ from utils import log_to_file, parse_arguments
 from tqdm import tqdm
 
 def evaluate(weights_file,
+			image_model_name='vgg16',
 			embedding_type='glove',
-			embedding_dim=300):
+			embedding_dim=300,
+			batch_size=200):
 
 	# create data loader
 	data_path = os.path.join(os.path.dirname(__file__), 'data')
@@ -26,10 +28,9 @@ def evaluate(weights_file,
 	embedding_matrix = get_embedding_matrix(word_index, embedding_type, embedding_path)
 
 	seq_length = 25
-	model_val = vqa_model(embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
+	model_val = vqa_model(image_model_name, embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
 	model_val.load_weights(weights_file)
 
-	batch_size = 2000
 	epochs = 1
 	iters = int(data_loader.val_num*epochs/batch_size)
 	val_accuracy = 0
@@ -48,9 +49,11 @@ def main():
 
 	args = parse_arguments()
 	weights_file = args.weights_file[0]
+	image_model_name = args.image_model_name
 	embedding_type = args.embedding_type
 	embedding_dim = args.embedding_dim
-	evaluate(weights_file, embedding_type, embedding_dim)
+	batch_size = args.batch_size
+	evaluate(weights_file, image_model_name, embedding_type, embedding_dim, batch_size)
 
 main()
 
