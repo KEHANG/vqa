@@ -1,13 +1,15 @@
 import os
 import numpy as np
-from data import DataLoaderDisk, get_bag_of_words_embedding_matrix, get_glove_embedding_matrix
+from data import DataLoaderDisk, get_embedding_matrix
 from model import vqa_model
-from utils import log_to_file
+from utils import log_to_file, parse_arguments
 
 ############################
 ####### Run Training #######
 ############################
-def train():
+def train(image_model_name='vgg16',
+          embedding_type='glove',
+          embedding_dim=300):
     # create folders needed
     if not os.path.exists('saved_models'):
       os.mkdir("saved_models")
@@ -24,12 +26,14 @@ def train():
 
     data_loader = DataLoaderDisk(**opt_data_train)
 
+    word_index = data_loader.tokenizer.word_index
+    if embedding_type == 'glove':
+      embedding_path = os.path.join(data_path, 'glove.6B', 
+                      'glove.6B.{0}d.txt'.format(embedding_dim))
+    embedding_matrix = get_embedding_matrix(word_index, embedding_type, embedding_path)
+
     seq_length = 25
-    glove_path = os.path.join(data_path, 'glove.6B', 'glove.6B.300d.txt')
-    # embedding_matrix = get_bag_of_words_embedding_matrix(data_loader.tokenizer.word_index)
-    embedding_matrix = get_glove_embedding_matrix(data_loader.tokenizer.word_index,
-                                                  glove_path)
-    model = vqa_model('vgg16', embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
+    model = vqa_model(image_model_name, embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
     
     batch_size = 100
     epochs = 100
@@ -59,6 +63,14 @@ def train():
         lr = float(0.0007 * np.exp(- epoch / 30))
         model.optimizer.lr.set_value(lr)
         model.save_weights('saved_models/model_weights_epoch_{0}.h5'.format(epoch))
+
+def main():
+
+  args = parse_arguments()
+  image_model_name = args.image_model_name
+  embedding_type = args.embedding_type
+  embedding_dim = args.embedding_dim
+  train(image_model_name, embedding_type, embedding_dim)
 
 train()
 
