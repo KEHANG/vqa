@@ -9,7 +9,8 @@ from utils import log_to_file, parse_arguments
 ############################
 def train(image_model_name='vgg16',
           embedding_type='glove',
-          embedding_dim=300):
+          embedding_dim=300,
+          batch_size=50):
     # create folders needed
     if not os.path.exists('saved_models'):
       os.mkdir("saved_models")
@@ -35,7 +36,6 @@ def train(image_model_name='vgg16',
     seq_length = 25
     model = vqa_model(image_model_name, embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
     
-    batch_size = 100
     epochs = 100
     iters = int(data_loader.train_num*epochs/batch_size)
     for iteration in range(iters):
@@ -70,7 +70,8 @@ def main():
   image_model_name = args.image_model_name
   embedding_type = args.embedding_type
   embedding_dim = args.embedding_dim
-  train(image_model_name, embedding_type, embedding_dim)
+  batch_size = args.batch_size
+  train(image_model_name, embedding_type, embedding_dim, batch_size)
 
 main()
 
