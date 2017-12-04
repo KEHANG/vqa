@@ -72,6 +72,6 @@ def main():
   embedding_dim = args.embedding_dim
   train(image_model_name, embedding_type, embedding_dim)
 
-train()
+main()
 
 
