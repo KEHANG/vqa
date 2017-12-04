@@ -29,7 +29,7 @@ def train():
     # embedding_matrix = get_bag_of_words_embedding_matrix(data_loader.tokenizer.word_index)
     embedding_matrix = get_glove_embedding_matrix(data_loader.tokenizer.word_index,
                                                   glove_path)
-    model = vqa_model(embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
+    model = vqa_model('vgg16', embedding_matrix, seq_length, dropout_rate=0.5, num_classes=3131)
     
     batch_size = 100
     epochs = 100
