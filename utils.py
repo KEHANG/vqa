@@ -15,6 +15,9 @@ def parse_arguments():
 	parser.add_argument('-ebd', '--embedding_dim', type=int, 
 		help='embedding dimension')
 
+	parser.add_argument('-bs', '--batch_size', type=int, 
+		help='batch size for training or validation (depends on which script)')
+
 	return parser.parse_args()
 
 def log_to_file(msg):
