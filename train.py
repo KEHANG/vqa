@@ -28,6 +28,7 @@ def train(image_model_name='vgg16',
     data_loader = DataLoaderDisk(**opt_data_train)
 
     word_index = data_loader.tokenizer.word_index
+    embedding_path = ''
     if embedding_type == 'glove':
       embedding_path = os.path.join(data_path, 'glove.6B', 
                       'glove.6B.{0}d.txt'.format(embedding_dim))

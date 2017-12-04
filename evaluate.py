@@ -22,6 +22,8 @@ def evaluate(weights_file,
 	data_loader = DataLoaderDisk(**option)
 
 	word_index = data_loader.tokenizer.word_index
+
+	embedding_path = ''
 	if embedding_type == 'glove':
 		embedding_path = os.path.join(data_path, 'glove.6B', 
 									  'glove.6B.{0}d.txt'.format(embedding_dim))
