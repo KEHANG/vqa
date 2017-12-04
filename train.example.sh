@@ -5,5 +5,5 @@ EBD=300
 BS=50
 
 source activate vqa_env
-python train.py -img $IMGMODEL -ebt $EBT -ebd $EBD -bs $BS
+THEANO_FLAGS=device=cuda python train.py -img $IMGMODEL -ebt $EBT -ebd $EBD -bs $BS
 source deactivate
