@@ -10,3 +10,4 @@ dependencies:
   - matplotlib
   - tqdm
   - python=2.7
+  - Flask
