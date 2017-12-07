@@ -1,4 +1,5 @@
 import os
+import shutil
 import numpy as np
 from flask import Flask, render_template, request
 from keras.preprocessing.sequence import pad_sequences
@@ -47,8 +48,8 @@ def vqa_home():
         image_name = 'abstract_v002_val2015_{0:012d}.png'.format(int(image_id))
 
         # if not in static copy it over
-        # if not image_cached(image_name):
-        #     copy_image(image_name)
+        if not image_cached(image_name):
+            cache_image(image_name)
 
         # ask question
         xque = str(request.form['question'])
@@ -83,3 +84,16 @@ def vqa_home():
 
     else:
         return render_template('vqa_home.html', home=True)
+
+def image_cached(image_name):
+
+    img_path = os.path.join(root, 'vqasite', 'static', 'img', image_name)
+    return os.path.exists(img_path)
+
+def cache_image(image_name):
+
+    src_path = os.path.join(root, 'data', 'scene_img_abstract_v002_val2015', image_name)
+    dst_path = os.path.join(root, 'vqasite', 'static', 'img', image_name)
+
+    shutil.copy(src_path, dst_path)
+
