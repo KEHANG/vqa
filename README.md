@@ -26,6 +26,7 @@ wget http://visualqa.org/data/abstract_v002/vqa/Annotations_Train_abstract_v002.
 wget http://visualqa.org/data/abstract_v002/vqa/Annotations_Val_abstract_v002.zip
 
 ## unzip them
+...
 
 ```
 
@@ -33,5 +34,5 @@ wget http://visualqa.org/data/abstract_v002/vqa/Annotations_Val_abstract_v002.zi
 
 ```
 source activate vqa_env
-python train.py
+bash train.example.sh
 ```
